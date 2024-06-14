@@ -674,6 +674,8 @@ _required_|List of options used to process this task|< <<_task_uuid_info_get_opt
 _optional_|Console output for the task (only if requested via ?output=<linenum>)|< string > array
 |*processingTime* +
 _required_|Milliseconds that have elapsed since the task started being processed.|integer
+|*totalElapsedTime* +
+_required_|Milliseconds that have elapsed since the task was created up until it finished.|integer
 |*status* +
 _required_||<<_task_uuid_info_get_status,status>>
 |*uuid* +

@@ -46,6 +46,7 @@ module.exports = class Task{
         this.dateCreated = isNaN(parseInt(dateCreated)) ? new Date().getTime() : parseInt(dateCreated);
         this.dateStarted = 0;
         this.processingTime = -1;
+        this.totalElapsedTime = -1;
         this.setStatus(statusCodes.RUNNING);
         this.options = options;
         this.gcpFiles = [];
@@ -233,9 +234,15 @@ module.exports = class Task{
     }
 
     updateProcessingTime(resetTime){
+        let time = new Date().getTime();
+
         this.processingTime = resetTime ?
                                 -1		:
-                                new Date().getTime() - this.dateCreated;
+                                time - (this.dateStarted != 0 ? this.dateStarted : time);
+
+        this.totalElapsedTime = resetTime ?
+                                -1      :
+                                time - this.dateCreated;
     }
 
     startTrackingProcessingTime(){
@@ -652,6 +659,7 @@ module.exports = class Task{
             name: this.name,
             dateCreated: this.dateCreated,
             processingTime: this.processingTime,
+            totalElapsedTime: this.totalElapsedTime,
             status: this.status,
             options: this.options,
             imagesCount: this.images !== undefined ? this.images.length : this.imagesCountEstimate,
