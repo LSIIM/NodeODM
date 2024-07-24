@@ -25,4 +25,6 @@ RUN chown -R odm:odm /code
 
 USER odm
 
+RUN chmod +x /var/www/scripts/postprocess.sh
+
 ENTRYPOINT ["/usr/bin/node", "/var/www/index.js"]

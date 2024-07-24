@@ -8,3 +8,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.gpu
+    expose:
+      - "3000"
+    restart: unless-stopped
+    oom_score_adj: 500
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
