@@ -1,4 +1,5 @@
-FROM opendronemap/odm:latest
+# por algum motivo a tag :latest não ta funcionando. Erro reportado pelo @Yuri. Usar a tag latest faz com que a linha 11 `apt-get install -y curl gpg-agent ca-certificates` falhe. A solução foi usar a tag :gpu
+FROM opendronemap/odm:gpu
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 EXPOSE 3000
