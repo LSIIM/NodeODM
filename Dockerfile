@@ -1,5 +1,5 @@
 # por algum motivo a tag :latest não ta funcionando. Erro reportado pelo @Yuri. Usar a tag latest faz com que a linha 11 `apt-get install -y curl gpg-agent ca-certificates` falhe. A solução foi usar a tag :gpu
-FROM opendronemap/odm:gpu
+FROM opendronemap/odm:3.5.6
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 EXPOSE 3000
@@ -24,3 +24,4 @@ COPY . /var/www
 RUN npm install --production && mkdir -p tmp
 
 ENTRYPOINT ["/usr/bin/node", "/var/www/index.js"]
+
