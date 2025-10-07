@@ -1,27 +1,32 @@
-# por algum motivo a tag :latest não ta funcionando. Erro reportado pelo @Yuri. Usar a tag latest faz com que a linha 11 `apt-get install -y curl gpg-agent ca-certificates` falhe. A solução foi usar a tag :gpu
 FROM opendronemap/odm:3.5.6
-MAINTAINER Piero Toffanin <pt@masseranolabs.com>
-
+ 
 EXPOSE 3000
 USER root
-
-# Instalação de pacotes
-
-RUN apt-get update 
-RUN apt-get install -y curl gpg-agent
-RUN curl --silent --location https://deb.nodesource.com/setup_14.x | bash -
-RUN apt-get install -y nodejs unzip p7zip-full && npm install -g nodemon && \
-    ln -s /code/SuperBuild/install/bin/untwine /usr/bin/untwine && \
-    ln -s /code/SuperBuild/install/bin/entwine /usr/bin/entwine && \
-    ln -s /code/SuperBuild/install/bin/pdal /usr/bin/pdal
-
-
-RUN mkdir /var/www
-
-WORKDIR "/var/www"
-COPY . /var/www
-
-RUN npm install --production && mkdir -p tmp
-
+ 
+# Instalar Node 20 e ferramentas
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends curl gpg-agent ca-certificates unzip p7zip-full; \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -; \
+    apt-get install -y --no-install-recommends nodejs; \
+    npm i -g npm; \
+    ln -s /code/SuperBuild/install/bin/untwine /usr/bin/untwine; \
+    ln -s /code/SuperBuild/install/bin/entwine /usr/bin/entwine; \
+    ln -s /code/SuperBuild/install/bin/pdal /usr/bin/pdal; \
+    rm -rf /var/lib/apt/lists/*
+ 
+RUN mkdir -p /var/www
+WORKDIR /var/www
+ 
+RUN useradd -m -d /home/odm -s /bin/bash odm
+COPY --chown=odm:odm . /var/www
+ 
+# Instalar dependencias em produção sem lockfile
+RUN npm install --omit=dev && mkdir -p tmp
+ 
+RUN chown -R odm:odm /var/www /code
+USER odm
+ 
+RUN chmod +x /var/www/scripts/postprocess.sh
+ 
 ENTRYPOINT ["/usr/bin/node", "/var/www/index.js"]
-
