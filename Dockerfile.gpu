@@ -1,32 +1,30 @@
-FROM opendronemap/odm:gpu
-MAINTAINER Piero Toffanin <pt@masseranolabs.com>
+FROM opendronemap/odm:3.5.6
 
 EXPOSE 3000
 USER root
 
+# Instalar Node 20 e ferramentas
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends curl gpg-agent ca-certificates unzip p7zip-full; \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -; \
+    apt-get install -y --no-install-recommends nodejs; \
+    npm i -g npm; \
+    ln -s /code/SuperBuild/install/bin/untwine /usr/bin/untwine; \
+    ln -s /code/SuperBuild/install/bin/entwine /usr/bin/entwine; \
+    ln -s /code/SuperBuild/install/bin/pdal /usr/bin/pdal; \
+    rm -rf /var/lib/apt/lists/*
 
-# Instalação de pacotes
+RUN mkdir -p /var/www
+WORKDIR /var/www
 
-RUN apt-get update 
-RUN apt-get install -y curl gpg-agent ca-certificates
-RUN curl --silent --location https://deb.nodesource.com/setup_14.x | bash -
-RUN apt-get install -y nodejs unzip p7zip-full && npm install -g nodemon && \
-    ln -s /code/SuperBuild/install/bin/untwine /usr/bin/untwine && \
-    ln -s /code/SuperBuild/install/bin/entwine /usr/bin/entwine && \
-    ln -s /code/SuperBuild/install/bin/pdal /usr/bin/pdal
-
-
-RUN mkdir /var/www
-
-WORKDIR "/var/www"
-RUN useradd -m -d "/home/odm" -s /bin/bash odm
+RUN useradd -m -d /home/odm -s /bin/bash odm
 COPY --chown=odm:odm . /var/www
 
-RUN npm install --production && mkdir -p tmp
+# Instalar dependencias em produção sem lockfile
+RUN npm install --omit=dev && mkdir -p tmp
 
-RUN chown -R odm:odm /var/www
-RUN chown -R odm:odm /code
-
+RUN chown -R odm:odm /var/www /code
 USER odm
 
 RUN chmod +x /var/www/scripts/postprocess.sh
